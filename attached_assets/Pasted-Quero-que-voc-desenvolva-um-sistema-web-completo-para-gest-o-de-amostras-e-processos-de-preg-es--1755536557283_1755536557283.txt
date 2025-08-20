@@ -1,0 +1,110 @@
+Quero que você desenvolva um sistema web completo para gestão de **amostras e processos de pregões**.  
+Use boas práticas de programação, arquitetura MVC, banco relacional e design responsivo e moderno.  
+
+## 🔧 Tecnologias sugeridas
+- Backend: Python (Django + Django Rest Framework) ou Flask (com blueprints organizados em MVC).  
+- Frontend: React (com TailwindCSS e shadcn/ui para design limpo e responsivo).  
+- Banco de dados: PostgreSQL.  
+- ORM: Django ORM (se Django) ou SQLAlchemy (se Flask).  
+- Machine Learning: scikit-learn (para viabilidade de amostras).  
+- NLP: TF-IDF + Similaridade cosseno para histórico inteligente.  
+- Autenticação: JWT ou sessão, com papéis (admin, analista, consulta).  
+- Deploy: Docker-ready.  
+
+---
+
+## 📂 Estrutura do Projeto
+- `backend/`
+  - `models/` (modelos ORM: Pregões, Itens, Amostras, Empenhos, Catálogo, Histórico, ML)
+  - `controllers/` (lógica de negócio: regras, cálculos, ML, importação)
+  - `routes/` (endpoints REST)
+  - `services/` (serviços auxiliares: parsing Excel/PDF, NLP, ML)
+  - `tests/` (testes unitários)
+- `frontend/`
+  - `components/` (botões, cards, tabelas, modais)
+  - `pages/` (Amostras, Processos, Catálogo, Histórico, Dashboard)
+  - `services/` (chamadas API para backend)
+  - `styles/` (Tailwind config + design system)
+- `docker-compose.yml`
+- `requirements.txt` ou `pyproject.toml`
+
+---
+
+## 📌 Funcionalidades obrigatórias
+
+### 1. Módulo Amostras
+- Importar planilhas (Excel/PDF/XML) → parser automático usando pandas, openpyxl, tabula, pytesseract (OCR).  
+- Criar **Pregão de Amostras** com:
+  - Nº do pregão, UASG, órgão, data de envio, código de rastreio, data de retorno, status, opção “será abatido”.  
+- Dentro do pregão → cadastrar **itens** com:
+  - Código interno (OR, 6B, AD, etc.), descrição, marca, lote, quantidade.  
+  - Resultado: Aprovado / Reprovado (se reprovado → campo motivo).  
+- Encerramento do pregão quando todos os itens tiverem resultado ou retorno/abatimento.  
+- Dashboard com lista de pregões de amostras e filtros.  
+
+### 2. Módulo Processos (Arrematados / Saldo / Empenhos / Vencidos)
+- Cadastro de pregões homologados (nº, órgão, UASG, tipo de contratação: Registro de Preços, Compra Direta, Dispensa, Compra Direta + RP).  
+- Registrar data de ata/contrato → sistema calcula **vigência automática**.  
+- Cadastrar itens arrematados (do catálogo ou novos).  
+- Controle de **saldo** automático.  
+- Registrar **empenhos**: nº, data, órgão, itens/quantidades → sistema abate saldo.  
+- Relatório **Arrematados x Empenhados** (% realizado, nº de empenhos, saldo, vencido).  
+- Ao vencer → pregão movido para seção de vencidos automaticamente.  
+
+### 3. Catálogo de Itens
+- Banco central de itens com:
+  - Código (OR, 6B, AD, etc.), descrição, marca.  
+- No cadastro → escolher item do catálogo ou criar novo.  
+
+### 4. Histórico Inteligente
+- Sistema reconhece quando item já foi enviado como amostra em pregões passados.  
+- Busca por similaridade de texto (TF-IDF + Coseno).  
+- Tela de pesquisa para mostrar itens relacionados e pregões anteriores.  
+
+### 5. Machine Learning – Viabilidade de Amostras
+- Treinar modelo ML (scikit-learn Logistic Regression/XGBoost).  
+- Entrada: quantidade, valor unitário, valor total, órgão, marca, tipo de item.  
+- Saída: **Viável / Não Viável** + score.  
+- Regras básicas + ML.  
+- Aprendizado contínuo com novos dados de aprovação/reprovação.  
+
+---
+
+## 🎨 Requisitos de Design
+- Frontend responsivo (desktop, tablet, celular).  
+- TailwindCSS + shadcn/ui → botões arredondados, cards com sombra suave, gráficos simples (recharts).  
+- Dashboard inicial com:
+  - Pregões de amostras em andamento.  
+  - Pregões homologados ativos e vencendo.  
+  - KPIs: taxa de aprovação de amostras, % empenhado vs arrematado.  
+- UX limpa e organizada (grid layouts, navegação lateral, filtros em tabelas).  
+
+---
+
+## 📊 Banco de Dados (DDL sugerida)
+### Tabelas principais:
+- `usuarios` (id, nome, email, senha_hash, perfil)  
+- `catalogo_itens` (id, codigo, descricao, marca)  
+- `pregoes_amostras` (id, numero, uasg, orgao, data_envio, rastreio, data_retorno, sera_abatido, status)  
+- `amostra_itens` (id, fk_pregao, fk_item, lote, quantidade, resultado, motivo)  
+- `pregoes_processos` (id, numero, uasg, orgao, tipo_contratacao, data_ata, vigencia_meses, status)  
+- `processo_itens` (id, fk_pregao, fk_item, quantidade_arrematada, quantidade_empenhada, saldo)  
+- `empenhos` (id, fk_pregao, numero_empenho, data, orgao)  
+- `empenho_itens` (id, fk_empenho, fk_processo_item, quantidade)  
+- `historico_relacionamentos` (id, fk_item, fk_item_relacionado, similaridade_score)  
+- `ml_predictions` (id, fk_amostra_item, score, viavel, modelo_versao)  
+
+---
+
+## ✅ Requisitos finais
+- Seguir boas práticas (MVC, DRY, testes unitários).  
+- Sistema modular e expansível (futuro: estoque, importações, qualidade).  
+- Responsivo, moderno, fácil de usar.  
+- API documentada (Swagger/OpenAPI).  
+- Exportação de relatórios (Excel/CSV).  
+
+Entregáveis:  
+- Backend + Frontend funcionando.  
+- Docker Compose para subir localmente.  
+- README com instruções.  
+- Telas com design bonito, intuitivo e responsivo.  

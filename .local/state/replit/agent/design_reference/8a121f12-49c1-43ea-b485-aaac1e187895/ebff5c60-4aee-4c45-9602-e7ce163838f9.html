@@ -1,0 +1,977 @@
+<html lang="pt-BR" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Amostras e Pregões</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8'
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="h-full font-inter">
+    <div class="min-h-full">
+        <!-- @COMPONENT: Sidebar Navigation -->
+        <div class="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
+            <div class="flex min-h-0 flex-1 flex-col bg-gray-900">
+                <div class="flex h-16 flex-shrink-0 items-center px-4">
+                    <i class="fas fa-clipboard-list text-2xl text-white mr-3"></i>
+                    <h1 class="text-white text-lg font-semibold">GestãoPregões</h1>
+                </div>
+                <div class="flex flex-1 flex-col overflow-y-auto">
+                    <nav class="flex-1 space-y-1 px-2 py-4">
+                        <!-- Dashboard -->
+                        <a href="#" class="bg-gray-800 text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md" data-event="click:navigateToDashboard">
+                            <i class="fas fa-tachometer-alt text-gray-300 mr-3 flex-shrink-0 h-6 w-6"></i>
+                            Dashboard
+                        </a>
+                        
+                        <!-- Amostras -->
+                        <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md" data-event="click:navigateToSamples">
+                            <i class="fas fa-vial text-gray-400 mr-3 flex-shrink-0 h-6 w-6"></i>
+                            Amostras
+                        </a>
+                        
+                        <!-- Processos -->
+                        <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md" data-event="click:navigateToProcesses">
+                            <i class="fas fa-file-contract text-gray-400 mr-3 flex-shrink-0 h-6 w-6"></i>
+                            Processos
+                        </a>
+                        
+                        <!-- Catálogo -->
+                        <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md" data-event="click:navigateToCatalog">
+                            <i class="fas fa-book text-gray-400 mr-3 flex-shrink-0 h-6 w-6"></i>
+                            Catálogo
+                        </a>
+                        
+                        <!-- Histórico -->
+                        <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md" data-event="click:navigateToHistory">
+                            <i class="fas fa-history text-gray-400 mr-3 flex-shrink-0 h-6 w-6"></i>
+                            Histórico
+                        </a>
+                        
+                        <!-- Relatórios -->
+                        <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md" data-event="click:navigateToReports">
+                            <i class="fas fa-chart-bar text-gray-400 mr-3 flex-shrink-0 h-6 w-6"></i>
+                            Relatórios
+                        </a>
+                    </nav>
+                </div>
+                
+                <!-- User Profile -->
+                <div class="flex flex-shrink-0 bg-gray-700 p-4">
+                    <div class="flex items-center">
+                        <div class="h-8 w-8 rounded-full bg-gray-500 flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-white" data-bind="user.name">Admin User</p>
+                            <p class="text-xs font-medium text-gray-300" data-bind="user.role">Administrador</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: Sidebar Navigation -->
+
+        <!-- @COMPONENT: Main Content Area -->
+        <div class="md:pl-64 flex flex-col flex-1">
+            <!-- Top Navigation -->
+            <div class="sticky top-0 z-10 md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-gray-50">
+                <button type="button" class="-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" data-event="click:toggleMobileMenu">
+                    <i class="fas fa-bars h-6 w-6"></i>
+                </button>
+            </div>
+            
+            <main class="flex-1">
+                <!-- Page Header -->
+                <div class="bg-white shadow">
+                    <div class="px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
+                        <div class="py-6 md:flex md:items-center md:justify-between">
+                            <div class="flex-1 min-w-0">
+                                <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                                    Dashboard
+                                </h1>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Visão geral dos pregões de amostras e processos ativos
+                                </p>
+                            </div>
+                            <div class="mt-6 flex space-x-3 md:mt-0 md:ml-4">
+                                <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-event="click:importData">
+                                    <i class="fas fa-upload -ml-1 mr-2 h-4 w-4"></i>
+                                    Importar
+                                </button>
+                                <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" data-event="click:createNewBidding">
+                                    <i class="fas fa-plus -ml-1 mr-2 h-4 w-4"></i>
+                                    Novo Pregão
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Content -->
+                <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+                        <!-- Amostras em Andamento -->
+                        <div class="bg-white overflow-hidden shadow rounded-lg">
+                            <div class="p-5">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-vial text-2xl text-blue-500"></i>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Amostras em Andamento</dt>
+                                            <dd class="text-3xl font-semibold text-gray-900" data-bind="stats.ongoingSamples">23</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-5 py-3">
+                                <div class="text-sm">
+                                    <span class="font-medium text-green-600">+12%</span>
+                                    <span class="text-gray-500">vs mês anterior</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Taxa de Aprovação -->
+                        <div class="bg-white overflow-hidden shadow rounded-lg">
+                            <div class="p-5">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Taxa de Aprovação</dt>
+                                            <dd class="text-3xl font-semibold text-gray-900" data-bind="stats.approvalRate">87%</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-5 py-3">
+                                <div class="text-sm">
+                                    <span class="font-medium text-green-600">+3%</span>
+                                    <span class="text-gray-500">vs mês anterior</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Processos Ativos -->
+                        <div class="bg-white overflow-hidden shadow rounded-lg">
+                            <div class="p-5">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-file-contract text-2xl text-purple-500"></i>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Processos Ativos</dt>
+                                            <dd class="text-3xl font-semibold text-gray-900" data-bind="stats.activeProcesses">156</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-5 py-3">
+                                <div class="text-sm">
+                                    <span class="font-medium text-red-600">-2%</span>
+                                    <span class="text-gray-500">vs mês anterior</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- % Empenhado -->
+                        <div class="bg-white overflow-hidden shadow rounded-lg">
+                            <div class="p-5">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-percentage text-2xl text-amber-500"></i>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">% Empenhado</dt>
+                                            <dd class="text-3xl font-semibold text-gray-900" data-bind="stats.commitmentPercentage">72%</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-5 py-3">
+                                <div class="text-sm">
+                                    <span class="font-medium text-green-600">+8%</span>
+                                    <span class="text-gray-500">vs mês anterior</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity and Quick Actions -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <!-- Pregões de Amostras Recentes -->
+                        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+                            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900">Pregões de Amostras Recentes</h3>
+                                <p class="mt-1 max-w-2xl text-sm text-gray-500">Últimos pregões em andamento</p>
+                            </div>
+                            <ul role="list" class="divide-y divide-gray-200">
+                                <!-- @MAP: recentSamples.map(sample => ( -->
+                                <li class="px-4 py-4 sm:px-6">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                                    <i class="fas fa-vial text-blue-600"></i>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900" data-bind="sample.number">Pregão 2024001</div>
+                                                <div class="text-sm text-gray-500" data-bind="sample.agency">UASG 123456 - Ministério da Saúde</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800" data-bind="sample.status">
+                                                Em Análise
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <!-- @END_MAP )) -->
+                                
+                                <li class="px-4 py-4 sm:px-6">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                                    <i class="fas fa-vial text-blue-600"></i>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Pregão 2024002</div>
+                                                <div class="text-sm text-gray-500">UASG 789012 - Ministério da Educação</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Aprovado
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                
+                                <li class="px-4 py-4 sm:px-6">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                                    <i class="fas fa-vial text-blue-600"></i>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Pregão 2024003</div>
+                                                <div class="text-sm text-gray-500">UASG 345678 - Ministério da Defesa</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                Reprovado
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="px-4 py-3 bg-gray-50 text-right">
+                                <a href="#" class="text-sm font-medium text-primary-600 hover:text-primary-500" data-event="click:viewAllSamples">Ver todos →</a>
+                            </div>
+                        </div>
+
+                        <!-- Processos Vencendo -->
+                        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+                            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900">Processos Vencendo</h3>
+                                <p class="mt-1 max-w-2xl text-sm text-gray-500">Próximos ao vencimento</p>
+                            </div>
+                            <ul role="list" class="divide-y divide-gray-200">
+                                <!-- @MAP: expiringProcesses.map(process => ( -->
+                                <li class="px-4 py-4 sm:px-6">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <div class="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
+                                                    <i class="fas fa-exclamation-triangle text-amber-600"></i>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900" data-bind="process.number">Contrato 2023045</div>
+                                                <div class="text-sm text-gray-500" data-bind="process.expiryDate">Vence em 15 dias</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="text-sm text-gray-500" data-bind="process.balance">Saldo: 85%</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <!-- @END_MAP )) -->
+                                
+                                <li class="px-4 py-4 sm:px-6">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <div class="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
+                                                    <i class="fas fa-exclamation-triangle text-amber-600"></i>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Contrato 2023046</div>
+                                                <div class="text-sm text-gray-500">Vence em 22 dias</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="text-sm text-gray-500">Saldo: 42%</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                
+                                <li class="px-4 py-4 sm:px-6">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+                                                    <i class="fas fa-clock text-red-600"></i>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Contrato 2023047</div>
+                                                <div class="text-sm text-gray-500">Vence em 5 dias</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="text-sm text-gray-500">Saldo: 96%</span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="px-4 py-3 bg-gray-50 text-right">
+                                <a href="#" class="text-sm font-medium text-primary-600 hover:text-primary-500" data-event="click:viewExpiringProcesses">Ver todos →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comprehensive Data Tables -->
+                    <div class="bg-white shadow overflow-hidden sm:rounded-md mb-6">
+                        <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900">Gestão de Amostras</h3>
+                                    <p class="mt-1 max-w-2xl text-sm text-gray-500">Controle detalhado de pregões e amostras</p>
+                                </div>
+                                <div class="flex space-x-3">
+                                    <input type="text" placeholder="Buscar pregões..." class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm" data-event="input:searchSamples">
+                                    <button type="button" class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" data-event="click:filterSamples">
+                                        <i class="fas fa-filter h-4 w-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nº Pregão</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UASG</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Órgão</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Envio</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Itens</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ML Score</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <!-- @MAP: samples.map(sample => ( -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" data-bind="sample.number">2024001</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-bind="sample.uasg">123456</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-bind="sample.agency">Min. Saúde</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-bind="sample.sendDate">15/03/2024</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800" data-bind="sample.status">
+                                                Em Análise
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-bind="sample.itemCount">5 itens</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <span class="text-sm font-medium text-green-600" data-bind="sample.mlScore">87%</span>
+                                                <span class="ml-1 text-xs text-gray-500">Viável</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary-600 hover:text-primary-900" data-event="click:viewSample" data-implementation="Open sample details modal">
+                                                    <i class="fas fa-eye h-4 w-4"></i>
+                                                </button>
+                                                <button class="text-gray-600 hover:text-gray-900" data-event="click:editSample">
+                                                    <i class="fas fa-edit h-4 w-4"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-900" data-event="click:deleteSample">
+                                                    <i class="fas fa-trash h-4 w-4"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- @END_MAP )) -->
+                                    
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2024002</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">789012</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Min. Educação</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12/03/2024</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Aprovado
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3 itens</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <span class="text-sm font-medium text-green-600">92%</span>
+                                                <span class="ml-1 text-xs text-gray-500">Viável</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary-600 hover:text-primary-900" data-event="click:viewSample">
+                                                    <i class="fas fa-eye h-4 w-4"></i>
+                                                </button>
+                                                <button class="text-gray-600 hover:text-gray-900" data-event="click:editSample">
+                                                    <i class="fas fa-edit h-4 w-4"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-900" data-event="click:deleteSample">
+                                                    <i class="fas fa-trash h-4 w-4"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2024003</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">345678</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Min. Defesa</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">10/03/2024</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                Reprovado
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">7 itens</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <span class="text-sm font-medium text-red-600">34%</span>
+                                                <span class="ml-1 text-xs text-gray-500">Não viável</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary-600 hover:text-primary-900" data-event="click:viewSample">
+                                                    <i class="fas fa-eye h-4 w-4"></i>
+                                                </button>
+                                                <button class="text-gray-600 hover:text-gray-900" data-event="click:editSample">
+                                                    <i class="fas fa-edit h-4 w-4"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-900" data-event="click:deleteSample">
+                                                    <i class="fas fa-trash h-4 w-4"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 sm:px-6">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-gray-700">
+                                    Mostrando <span class="font-medium">1</span> a <span class="font-medium">3</span> de <span class="font-medium">23</span> resultados
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" data-event="click:previousPage">
+                                        <i class="fas fa-chevron-left h-4 w-4 mr-1"></i>
+                                        Anterior
+                                    </button>
+                                    <button class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" data-event="click:nextPage">
+                                        Próxima
+                                        <i class="fas fa-chevron-right h-4 w-4 ml-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Process Management Section -->
+                    <div class="bg-white shadow overflow-hidden sm:rounded-md mb-6">
+                        <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900">Gestão de Processos</h3>
+                                    <p class="mt-1 max-w-2xl text-sm text-gray-500">Controle de contratos, saldos e empenhos</p>
+                                </div>
+                                <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" data-event="click:createContract">
+                                    <i class="fas fa-plus -ml-1 mr-2 h-4 w-4"></i>
+                                    Novo Contrato
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nº Contrato</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Órgão</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vigência</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% Empenhado</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <!-- @MAP: processes.map(process => ( -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" data-bind="process.number">CONT-2024-001</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-bind="process.agency">Min. Saúde</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-bind="process.type">Registro de Preços</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-bind="process.validity">12 meses</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-bind="process.balance">R$ 1.250.000,00</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="w-16 bg-gray-200 rounded-full h-2">
+                                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 72%" data-bind="process.commitmentPercentage"></div>
+                                                </div>
+                                                <span class="ml-2 text-sm text-gray-600">72%</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800" data-bind="process.status">
+                                                Ativo
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary-600 hover:text-primary-900" data-event="click:viewProcess" title="Ver detalhes">
+                                                    <i class="fas fa-eye h-4 w-4"></i>
+                                                </button>
+                                                <button class="text-green-600 hover:text-green-900" data-event="click:addCommitment" title="Adicionar empenho">
+                                                    <i class="fas fa-plus-circle h-4 w-4"></i>
+                                                </button>
+                                                <button class="text-gray-600 hover:text-gray-900" data-event="click:editProcess" title="Editar">
+                                                    <i class="fas fa-edit h-4 w-4"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- @END_MAP )) -->
+                                    
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">CONT-2024-002</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Min. Educação</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Compra Direta</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">6 meses</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ 850.000,00</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="w-16 bg-gray-200 rounded-full h-2">
+                                                    <div class="bg-amber-500 h-2 rounded-full" style="width: 95%"></div>
+                                                </div>
+                                                <span class="ml-2 text-sm text-gray-600">95%</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                Vencendo
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary-600 hover:text-primary-900" data-event="click:viewProcess">
+                                                    <i class="fas fa-eye h-4 w-4"></i>
+                                                </button>
+                                                <button class="text-green-600 hover:text-green-900" data-event="click:addCommitment">
+                                                    <i class="fas fa-plus-circle h-4 w-4"></i>
+                                                </button>
+                                                <button class="text-gray-600 hover:text-gray-900" data-event="click:editProcess">
+                                                    <i class="fas fa-edit h-4 w-4"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Item Catalog and Intelligent History -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Item Catalog -->
+                        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+                            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-lg leading-6 font-medium text-gray-900">Catálogo de Itens</h3>
+                                        <p class="mt-1 max-w-2xl text-sm text-gray-500">Base central de produtos</p>
+                                    </div>
+                                    <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" data-event="click:addItemToCatalog">
+                                        <i class="fas fa-plus h-4 w-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="px-4 py-2">
+                                <input type="text" placeholder="Pesquisar itens..." class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm" data-event="input:searchCatalog">
+                            </div>
+                            <ul role="list" class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+                                <!-- @MAP: catalogItems.map(item => ( -->
+                                <li class="px-4 py-3 hover:bg-gray-50">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex-1">
+                                            <div class="text-sm font-medium text-gray-900" data-bind="item.code">OR-001</div>
+                                            <div class="text-sm text-gray-500" data-bind="item.description">Medicamento Analgésico</div>
+                                            <div class="text-xs text-gray-400" data-bind="item.brand">Marca: Genérico</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="text-gray-400 hover:text-gray-600" data-event="click:editCatalogItem">
+                                                <i class="fas fa-edit h-4 w-4"></i>
+                                            </button>
+                                            <button class="text-red-400 hover:text-red-600" data-event="click:removeCatalogItem">
+                                                <i class="fas fa-trash h-4 w-4"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+                                <!-- @END_MAP )) -->
+                                
+                                <li class="px-4 py-3 hover:bg-gray-50">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex-1">
+                                            <div class="text-sm font-medium text-gray-900">6B-002</div>
+                                            <div class="text-sm text-gray-500">Material Cirúrgico</div>
+                                            <div class="text-xs text-gray-400">Marca: MedSupply</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="text-gray-400 hover:text-gray-600" data-event="click:editCatalogItem">
+                                                <i class="fas fa-edit h-4 w-4"></i>
+                                            </button>
+                                            <button class="text-red-400 hover:text-red-600" data-event="click:removeCatalogItem">
+                                                <i class="fas fa-trash h-4 w-4"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+                                
+                                <li class="px-4 py-3 hover:bg-gray-50">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex-1">
+                                            <div class="text-sm font-medium text-gray-900">AD-003</div>
+                                            <div class="text-sm text-gray-500">Equipamento Diagnóstico</div>
+                                            <div class="text-xs text-gray-400">Marca: DiagTech</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="text-gray-400 hover:text-gray-600" data-event="click:editCatalogItem">
+                                                <i class="fas fa-edit h-4 w-4"></i>
+                                            </button>
+                                            <button class="text-red-400 hover:text-red-600" data-event="click:removeCatalogItem">
+                                                <i class="fas fa-trash h-4 w-4"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Intelligent History -->
+                        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+                            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900">Histórico Inteligente</h3>
+                                <p class="mt-1 max-w-2xl text-sm text-gray-500">Busca por similaridade de itens</p>
+                            </div>
+                            <div class="px-4 py-2">
+                                <div class="relative">
+                                    <input type="text" placeholder="Digite descrição do item..." class="block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm" data-event="input:intelligentSearch">
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                        <i class="fas fa-search h-4 w-4 text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <ul role="list" class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+                                <!-- @MAP: similarItems.map(item => ( -->
+                                <li class="px-4 py-3">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex-1">
+                                            <div class="flex items-center">
+                                                <div class="text-sm font-medium text-gray-900" data-bind="item.description">Medicamento Analgésico Similar</div>
+                                                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800" data-bind="item.similarity">92% similar</span>
+                                            </div>
+                                            <div class="mt-1">
+                                                <span class="text-xs text-gray-500" data-bind="item.previousBidding">Pregão 2023045 - Min. Saúde</span>
+                                                <span class="ml-2 text-xs text-green-600" data-bind="item.result">Aprovado</span>
+                                            </div>
+                                            <div class="mt-1 text-xs text-gray-400" data-bind="item.date">Enviado em 15/12/2023</div>
+                                        </div>
+                                        <button class="ml-2 text-primary-600 hover:text-primary-900" data-event="click:viewSimilarItemDetails" title="Ver detalhes">
+                                            <i class="fas fa-external-link-alt h-4 w-4"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                                <!-- @END_MAP )) -->
+                                
+                                <li class="px-4 py-3">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex-1">
+                                            <div class="flex items-center">
+                                                <div class="text-sm font-medium text-gray-900">Material Cirúrgico Equivalente</div>
+                                                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">87% similar</span>
+                                            </div>
+                                            <div class="mt-1">
+                                                <span class="text-xs text-gray-500">Pregão 2023089 - Min. Defesa</span>
+                                                <span class="ml-2 text-xs text-red-600">Reprovado</span>
+                                            </div>
+                                            <div class="mt-1 text-xs text-gray-400">Enviado em 22/11/2023</div>
+                                        </div>
+                                        <button class="ml-2 text-primary-600 hover:text-primary-900" data-event="click:viewSimilarItemDetails">
+                                            <i class="fas fa-external-link-alt h-4 w-4"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="px-4 py-3 bg-gray-50 text-center">
+                                <p class="text-sm text-gray-500">
+                                    <!-- @FUNCTIONALITY: This should implement TF-IDF + Cosine similarity for intelligent text matching -->
+                                    <i class="fas fa-brain mr-2"></i>
+                                    Powered by ML Text Similarity
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <!-- @END_COMPONENT: Main Content Area -->
+
+        <!-- @COMPONENT: Sample Details Modal -->
+        <div class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="sampleModal" data-implementation="Show/hide based on modal state">
+            <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Detalhes do Pregão de Amostras</h3>
+                    <button class="text-gray-400 hover:text-gray-600" data-event="click:closeModal">
+                        <i class="fas fa-times h-6 w-6"></i>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nº do Pregão</label>
+                        <div class="mt-1 text-sm text-gray-900" data-bind="selectedSample.number">2024001</div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">UASG</label>
+                        <div class="mt-1 text-sm text-gray-900" data-bind="selectedSample.uasg">123456</div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Órgão</label>
+                        <div class="mt-1 text-sm text-gray-900" data-bind="selectedSample.agency">Ministério da Saúde</div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Data de Envio</label>
+                        <div class="mt-1 text-sm text-gray-900" data-bind="selectedSample.sendDate">15/03/2024</div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Código de Rastreio</label>
+                        <div class="mt-1 text-sm text-gray-900" data-bind="selectedSample.trackingCode">BR123456789</div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Status</label>
+                        <span class="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800" data-bind="selectedSample.status">
+                            Em Análise
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-md font-medium text-gray-900 mb-3">Itens da Amostra</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Descrição</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Marca</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Qtd</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Resultado</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ML Score</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <!-- @MAP: selectedSample.items.map(item => ( -->
+                                <tr>
+                                    <td class="px-4 py-2 text-sm font-medium text-gray-900" data-bind="item.code">OR-001</td>
+                                    <td class="px-4 py-2 text-sm text-gray-500" data-bind="item.description">Medicamento Analgésico</td>
+                                    <td class="px-4 py-2 text-sm text-gray-500" data-bind="item.brand">Genérico</td>
+                                    <td class="px-4 py-2 text-sm text-gray-500" data-bind="item.quantity">100</td>
+                                    <td class="px-4 py-2">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800" data-bind="item.result">
+                                            Aprovado
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center">
+                                            <span class="text-green-600 font-medium" data-bind="item.mlScore">92%</span>
+                                            <span class="ml-1 text-gray-500 text-xs">Viável</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- @END_MAP )) -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" data-event="click:closeModal">
+                        Fechar
+                    </button>
+                    <button type="button" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" data-event="click:editSample">
+                        Editar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: Sample Details Modal -->
+
+        <!-- @COMPONENT: Import Data Modal -->
+        <div class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="importModal" data-implementation="File upload modal with drag-and-drop">
+            <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 shadow-lg rounded-md bg-white">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Importar Dados</h3>
+                    <button class="text-gray-400 hover:text-gray-600" data-event="click:closeImportModal">
+                        <i class="fas fa-times h-6 w-6"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Tipo de Importação
+                    </label>
+                    <select class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500">
+                        <option value="samples">Pregão de Amostras</option>
+                        <option value="processes">Processos/Contratos</option>
+                        <option value="catalog">Catálogo de Itens</option>
+                    </select>
+                </div>
+
+                <div class="mb-6">
+                    <!-- @FUNCTIONALITY: This should implement drag-and-drop file upload with Excel/PDF/XML parsing -->
+                    <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-primary-400 transition-colors">
+                        <div class="space-y-1 text-center">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+                            <div class="flex text-sm text-gray-600">
+                                <label class="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500">
+                                    <span>Escolher arquivo</span>
+                                    <input type="file" class="sr-only" accept=".xlsx,.xls,.pdf,.xml" data-event="change:handleFileSelect">
+                                </label>
+                                <p class="pl-1">ou arraste e solte</p>
+                            </div>
+                            <p class="text-xs text-gray-500">Excel, PDF ou XML até 10MB</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" data-event="click:closeImportModal">
+                        Cancelar
+                    </button>
+                    <button type="button" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" data-event="click:processImport" data-implementation="Should validate file and process with pandas/openpyxl">
+                        <i class="fas fa-upload mr-2 h-4 w-4"></i>
+                        Importar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: Import Data Modal -->
+    </div>
+
+    <script>
+        (function() {
+            // TODO: Implement business logic, API calls, and state management
+            
+            // Simple interactive behaviors for demonstration
+            let currentView = 'dashboard';
+            
+            // Modal management
+            function showModal(modalId) {
+                document.getElementById(modalId)?.classList.remove('hidden');
+            }
+            
+            function hideModal(modalId) {
+                document.getElementById(modalId)?.classList.add('hidden');
+            }
+            
+            // Event listeners for demonstration
+            document.addEventListener('click', function(e) {
+                // Sample modal
+                if (e.target.closest('[data-event*="viewSample"]')) {
+                    showModal('sampleModal');
+                }
+                
+                if (e.target.closest('[data-event*="closeModal"]')) {
+                    hideModal('sampleModal');
+                }
+                
+                // Import modal
+                if (e.target.closest('[data-event*="importData"]')) {
+                    showModal('importModal');
+                }
+                
+                if (e.target.closest('[data-event*="closeImportModal"]')) {
+                    hideModal('importModal');
+                }
+            });
+            
+            // Close modals on ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    hideModal('sampleModal');
+                    hideModal('importModal');
+                }
+            });
+            
+            // Close modals on backdrop click
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('bg-gray-600')) {
+                    hideModal('sampleModal');
+                    hideModal('importModal');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

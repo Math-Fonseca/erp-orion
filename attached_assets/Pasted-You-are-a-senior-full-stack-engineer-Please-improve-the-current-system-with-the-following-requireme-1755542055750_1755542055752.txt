@@ -1,0 +1,60 @@
+You are a senior full-stack engineer. Please improve the current system with the following requirements.  
+Use good programming practices, MVC structure, responsive modern design, and ensure all data is properly connected to the database.  
+
+---
+
+### 🔹 Fixes and Enhancements
+
+#### 1. Samples (Amostras)
+- Add **tracking code (Código de Rastreio)** field to be visible in the sample list and details view.  
+- Fix **Status values**: must display without underscores. Correct options are:  
+  - "Em Andamento", "Aprovado", "Reprovado", "Encerrado".  
+- Each **Pregão de Amostra** must allow attaching **Items** (1:N relationship):  
+  - Fields: Código do Item, Descrição, Marca, Lote, Quantidade, Resultado da Avaliação (Aprovado/Reprovado/Pendente), Motivo da Reprovação (only if status = Reprovado).  
+- Items must support **full CRUD (add, edit, delete)** inside the sample.  
+- Dashboard cards and lists must use these real values instead of static placeholders.
+
+#### 2. Processes (Processos / Homologated Biddings)
+- Add support to register **Homologated Pregões**.  
+- Each Process must have: Nº do Contrato, Órgão, Tipo de Contratação (Registro de Preços, Compra Direta, Dispensa, CD+RP), Vigência (meses), Status, and Data do Contrato.  
+- Inside each Process, allow adding **Items** with: Código, Descrição, Marca, Modelo, Lote, Quantidade, Unit Price.  
+- The system must automatically calculate **Total Value = Quantidade × Unit Price**.  
+- Add the ability to register **Empenhos** under each Process:  
+  - For each Empenho, select which Items are included, their quantities, and values.  
+  - When an Empenho is created, the system must automatically **deduct** the quantity and value from the Process/Contract totals.  
+- Ensure % Empenhado, Saldo, and Total Values are calculated dynamically based on real data.
+
+#### 3. Catalog of Items
+- Add **Lote (Batch)** as a mandatory field.  
+- Catalog must allow search by Código, Descrição, Marca, and Lote.  
+- Support importing Excel files into the Catalog (with validation: no duplicates, no empty required fields).  
+
+#### 4. Dashboard & Reports
+- **Remove all mock data**. All metrics must be calculated directly from the database:  
+  - Samples → count in progress, approved, rejected, closed.  
+  - Processes → active, expired, % empenhado, saldo.  
+  - Catalog → total items, grouped by brand/lote.  
+- **Filters must work dynamically**:  
+  - If “Samples” is selected, show metrics about amostras.  
+  - If “Processes” is selected, show contracts, empenhos, balances.  
+  - If “General” is selected, aggregate everything.  
+- Reports (charts, analytics) must always reflect **real-time data**.  
+- Export options (Excel, PDF, CSV) must use **actual filtered results**.  
+
+#### 5. General
+- Responsive design across desktop and mobile.  
+- Clean UI with badges (status, % empenhado, etc.).  
+- All tables must update automatically when new data is created/edited/deleted.  
+- Follow MVC architecture with a clear separation of controllers, models, and views.  
+
+---
+
+### 🔹 Tech Notes
+- Ensure backend is properly handling validation (e.g., no duplicate pregão number, required fields).  
+- All numbers (values, quantities) must be formatted according to Brazilian standards (e.g., R$ 1.250,00).  
+- Use database queries for analytics (group by month, group by org, etc.) instead of static placeholders.  
+- Keep the system scalable: processes, samples, items, and empenhos must have proper relationships in the DB schema.  
+
+---
+
+⚡ Final goal: The system must allow full management of **Samples, Processes, Catalog, Reports** with real data persistence, no mock values, dynamic calculations, and user-friendly design.
